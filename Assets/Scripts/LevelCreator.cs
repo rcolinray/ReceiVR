@@ -81,7 +81,7 @@ public class LevelCreator : MonoBehaviour
             {
                 if (Random.Range(0.0f, 1.0f) <= challenge)
                 {
-                    Vector3 pos = new Vector3(0, 0, where * 20) + child.localPosition;
+                    Vector3 pos = new Vector3(0, 0, where * 20) + child.localPosition + enemies.position;
                     GameObject childObj = Instantiate(child.gameObject, pos, child.localRotation);
                     childObj.transform.parent = level.transform;
                 }
@@ -96,7 +96,7 @@ public class LevelCreator : MonoBehaviour
             {
                 if (Random.Range(0.0f, 1.0f) <= itemChallenge)
                 {
-                    Vector3 pos = new Vector3(0, 0, where * 20) + child.localPosition;
+                    Vector3 pos = new Vector3(0, 0, where * 20) + child.localPosition + items.position;
                     GameObject childObj = Instantiate(child.gameObject, pos, child.localRotation);
                     childObj.transform.parent = level.transform;
                 }
