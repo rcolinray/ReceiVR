@@ -1,85 +1,83 @@
-﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using System.Collections;
 
-public class ShootableLight : MonoBehaviour
+public enum LightType
 {
+    AIRPLANE_BLINK = 0,
+    NORMAL = 1,
+    FLICKER = 2
+}
 
-    public enum LightType
+[System.Serializable]
+public partial class ShootableLight : MonoBehaviour
+{
+    public GameObject destroy_effect;
+    public Color light_color;
+    public bool destroyed;
+    public LightType light_type;
+    private float blink_delay;
+    private float light_amount;
+    public virtual void WasShot(GameObject obj, Vector3 pos, Vector3 vel)
     {
-        AirplaneBlink,
-        Normal,
-        Flicker,
+        if (!this.destroyed)
+        {
+            this.destroyed = true;
+            this.light_amount = 0f;
+            UnityEngine.Object.Instantiate(this.destroy_effect, this.transform.Find("bulb").position, Quaternion.identity);
+        }
+        if ((obj && obj.GetComponent<Collider>()) && (obj.GetComponent<Collider>().material.name == "glass (Instance)"))
+        {
+            GameObject.Destroy(obj);
+        }
     }
 
-    public LightType lightType = LightType.Normal;
-
-    public GameObject destroyEffect;
-    public Color lightColor = new Color(1.0f, 1.0f, 1.0f, 1.0f);
-    public bool destroyed = false;
-
-    private float blinkDelay = 0.0f;
-    private float lightAmount = 1.0f;
-
-    // Update is called once per frame
-    void Update()
+    public virtual void Start()
     {
-        if (!destroyed)
+    }
+
+    public virtual void Update()
+    {
+        if (!this.destroyed)
         {
-            switch (lightType)
+            switch (this.light_type)
             {
-                case LightType.AirplaneBlink:
-                    if (blinkDelay <= 0.0f)
+                case LightType.AIRPLANE_BLINK:
+                    if (this.blink_delay <= 0f)
                     {
-                        blinkDelay = 1.0f;
-                        if (lightAmount == 1.0f)
+                        this.blink_delay = 1f;
+                        if (this.light_amount == 1f)
                         {
-                            lightAmount = 0.0f;
+                            this.light_amount = 0f;
                         }
                         else
                         {
-                            lightAmount = 1.0f;
+                            this.light_amount = 1f;
                         }
                     }
-                    blinkDelay -= Time.deltaTime;
+                    this.blink_delay = this.blink_delay - Time.deltaTime;
                     break;
             }
         }
-
-        Color combinedColor = lightColor * lightAmount;
-        Light[] lights = gameObject.GetComponentsInChildren<Light>();
-        foreach (Light light in lights)
+        Color combined_color = new Color(this.light_color.r * this.light_amount, this.light_color.g * this.light_amount, this.light_color.b * this.light_amount);
+        foreach (Light light in this.gameObject.GetComponentsInChildren(typeof(Light)))
         {
-            light.color = combinedColor;
+            light.color = combined_color;
         }
-
-        MeshRenderer[] renderers = gameObject.GetComponentsInChildren<MeshRenderer>();
-        foreach (MeshRenderer renderer in renderers)
+        foreach (MeshRenderer renderer in this.gameObject.GetComponentsInChildren(typeof(MeshRenderer)))
         {
-            renderer.material.SetColor("_Illum", combinedColor);
+            renderer.material.SetColor("_Illum", combined_color);
             if (renderer.gameObject.name == "shade")
             {
-                renderer.material.SetColor("_Illum", combinedColor * 0.5f);
+                renderer.material.SetColor("_Illum", combined_color * 0.5f);
             }
         }
     }
 
-    void WasShot(GameObject obj, Vector3 pos, Vector3 vel)
+    public ShootableLight()
     {
-        if (!destroyed)
-        {
-            destroyed = true;
-            lightAmount = 0.0f;
-            Instantiate(destroyEffect, transform.Find("bulb").position, Quaternion.identity);
-        }
-
-        if (obj != null)
-        {
-            Collider collider = obj.GetComponent<Collider>();
-            if (collider != null && collider.material.name == "glass (Instance)")
-            {
-                Destroy(obj);
-            }
-        }
+        this.light_color = new Color(1, 1, 1);
+        this.light_type = LightType.NORMAL;
+        this.light_amount = 1f;
     }
+
 }

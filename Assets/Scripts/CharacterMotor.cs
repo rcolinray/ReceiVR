@@ -191,6 +191,11 @@ public class CharacterMotor : MonoBehaviour
     private Transform tr;
     private CharacterController controller;
 
+    public Vector3 GetVelocity()
+    {
+        return movement.velocity;
+    }
+
     void Awake()
     {
         controller = GetComponent<CharacterController>();
