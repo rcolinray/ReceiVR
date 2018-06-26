@@ -34,8 +34,8 @@ public class CharacterMotor : MonoBehaviour
         GetComponent<AudioSource>().PlayOneShot(clip, volumeScale);
     }
 
-    private float standHeight = 2.0f;
-    private float crouchHeight = 2.0f;
+    // private float standHeight = 2.0f;
+    // private float crouchHeight = 2.0f;
     private bool crouching = false;
     private float stepTimer = 0.0f;
     private float headBob = 0.0f;
